@@ -14,7 +14,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        <#list tableClass.allFields as field>${field.columnName}<#sep>,<#if field_index &gt; 0 && field_index%5==0>${"\n        "}</#if></#list>
+        <#list tableClass.allFields as field>${field.columnName}<#sep>,<#if field_index%3==2>${"\n        "}</#if></#list>
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">

@@ -1,6 +1,8 @@
 package com.baomidou.plugin.idea.mybatisx.generate.plugin.helper;
 
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.mybatis.generator.api.FullyQualifiedTable;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
@@ -232,6 +234,16 @@ public class IntellijIntrospector {
                         introspectedColumn.setJdbcTypeName("OTHER");
                         String warning = Messages.getString("Warning.14", Integer.toString(introspectedColumn.getJdbcType()), entry.getKey().toString(), introspectedColumn.getActualColumnName());
                         this.warnings.add(warning);
+                    }
+                }
+
+                //TODO: column OTHER to JSON
+                if ("JSON".equals(introspectedColumn.getJdbcTypeName())) {
+                    introspectedColumn.setJdbcTypeName("OTHER");
+                    if (introspectedColumn.getRemarks() != null && introspectedColumn.getRemarks().contains("数组")) {
+                        introspectedColumn.setFullyQualifiedJavaType(new FullyQualifiedJavaType(ArrayNode.class.getName()));
+                    } else {
+                        introspectedColumn.setFullyQualifiedJavaType(new FullyQualifiedJavaType(ObjectNode.class.getName()));
                     }
                 }
 

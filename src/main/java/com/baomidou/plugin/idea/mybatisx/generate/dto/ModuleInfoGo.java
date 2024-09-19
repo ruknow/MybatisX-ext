@@ -3,6 +3,8 @@ package com.baomidou.plugin.idea.mybatisx.generate.dto;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author :ls9527
@@ -51,6 +53,28 @@ public class ModuleInfoGo implements Serializable {
 
     private Boolean needJdbcType;
 
+    private String superClass;
+
+    private String shortSuperClass;
+
+    private String baseClass;
+
+    private String shortBaseClass;
+
+    private final List<String> superFieldNames = new ArrayList<>();
+
+    private final List<SuperFieldInfo> superFields = new ArrayList<>();
+
+    public void setSuperFields(List<SuperFieldInfo> superFields) {
+        this.superFields.clear();
+        this.superFields.addAll(superFields);
+
+        superFieldNames.clear();
+        for (SuperFieldInfo superField : superFields) {
+            superFieldNames.add(superField.getColumnName());
+        }
+    }
+
     public void setFileNameWithSuffix(String fileNameWithSuffix) {
         this.fileNameWithSuffix = fileNameWithSuffix;
     }
@@ -89,5 +113,30 @@ public class ModuleInfoGo implements Serializable {
 
     public void setNeedJdbcType(Boolean needJdbcType) {
         this.needJdbcType = needJdbcType;
+    }
+
+    public void setSuperClass(String superClass) {
+        this.superClass = superClass;
+    }
+
+    public void setShortSuperClass(String shortSuperClass) {
+        this.shortSuperClass = shortSuperClass;
+    }
+
+    public void setBaseClass(String baseClass) {
+        this.baseClass = baseClass;
+    }
+
+    public void setShortBaseClass(String shortBaseClass) {
+        this.shortBaseClass = shortBaseClass;
+    }
+
+    public boolean isSuperColumn(String columnName) {
+        for (String superFieldName : superFieldNames) {
+            if (superFieldName.equalsIgnoreCase(columnName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

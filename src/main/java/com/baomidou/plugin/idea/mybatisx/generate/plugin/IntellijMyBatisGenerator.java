@@ -310,6 +310,12 @@ public class IntellijMyBatisGenerator {
     }
 
     private void writeFile(File file, String content, String fileEncoding) throws IOException {
+        //TODO: 生成的非基类文件不能覆盖
+        if (file.exists() && file.isFile() && !file.getName().startsWith("Base")) {
+            this.warnings.add("Skip exist file: " + file);
+            return;
+        }
+
         FileOutputStream fos = new FileOutputStream(file, false);
         OutputStreamWriter osw;
         if (fileEncoding == null) {

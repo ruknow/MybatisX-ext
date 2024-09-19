@@ -1,9 +1,11 @@
 package com.baomidou.plugin.idea.mybatisx.generate.plugin;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.internal.types.JavaTypeResolverDefaultImpl;
 
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -32,6 +34,10 @@ public class JavaTypeResolverJsr310Impl extends JavaTypeResolverDefaultImpl {
         super.addConfigurationProperties(properties);
         this.supportJsr = "true".equals(properties.getProperty("supportJsr"));
         this.supportAutoNumeric = "true".equals(properties.getProperty("supportAutoNumeric"));
+
+        //TODO: jdbc OTHER to JSON
+        typeMap.put(Types.OTHER,  new JdbcTypeInformation("JSON", //$NON-NLS-1$
+            new FullyQualifiedJavaType(ObjectNode.class.getName())));
     }
 
     private FullyQualifiedJavaType calcNumeric(IntrospectedColumn column, FullyQualifiedJavaType defaultType) {

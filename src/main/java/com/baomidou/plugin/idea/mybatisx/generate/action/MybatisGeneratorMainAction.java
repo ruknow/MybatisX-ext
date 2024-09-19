@@ -10,6 +10,7 @@ import com.baomidou.plugin.idea.mybatisx.generate.template.GenerateCode;
 import com.baomidou.plugin.idea.mybatisx.util.PluginExistsUtils;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.psi.DbTable;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
@@ -126,6 +127,11 @@ public class MybatisGeneratorMainAction extends AnAction {
             e.getPresentation().setEnabledAndVisible(visible);
         }
 
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     private static class CheckMatch {

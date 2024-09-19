@@ -1,10 +1,12 @@
 package com.baomidou.plugin.idea.mybatisx.generate.template;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.ConfigSetting;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.CustomTemplateRoot;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.DomainInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.GenerateConfig;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.ModuleInfoGo;
+import com.baomidou.plugin.idea.mybatisx.generate.dto.SuperFieldInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.TemplateSettingDTO;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.DaoEntityAnnotationInterfacePlugin;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.IgnoreParentFieldsPlugin;
@@ -20,6 +22,8 @@ import com.baomidou.plugin.idea.mybatisx.util.SpringStringUtils;
 import com.baomidou.plugin.idea.mybatisx.util.StringUtils;
 import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiManager;
@@ -108,18 +112,41 @@ public class GenerateCode {
 
         String relativePackage = generateConfig.getRelativePackage();
         if (null != relativePackage && !"".equals(relativePackage)) {
-            relativePackage = "." + relativePackage;
+            relativePackage = "." + relativePackage + ".ext";
         }
         javaModelGeneratorConfiguration.setTargetPackage(generateConfig.getBasePackage() + relativePackage);
 
         context.setJavaModelGeneratorConfiguration(javaModelGeneratorConfiguration);
 
+        final List<SuperFieldInfo> superFieldList = new ArrayList<>();
         final List<ClassLoader> classLoaderList = new ArrayList<>();
         if (SpringStringUtils.hasText(generateConfig.getSuperClass())) {
             javaModelGeneratorConfiguration.addProperty(PropertyRegistry.ANY_ROOT_CLASS, generateConfig.getSuperClass());
             final Optional<PsiClass> psiClassOptional = JavaUtils.findClazz(project, generateConfig.getSuperClass());
-            psiClassOptional.ifPresent(psiClass -> classLoaderList.add(new MybatisXClassPathDynamicClassLoader(psiClass)));
+            psiClassOptional.ifPresent(psiClass -> {
+                MybatisXClassPathDynamicClassLoader dynamicClassLoader = new MybatisXClassPathDynamicClassLoader(psiClass);
+                classLoaderList.add(dynamicClassLoader);
 
+                for (PsiField field : psiClass.getAllFields()) {
+                    PsiAnnotation annotation = field.getAnnotation(TableField.class.getName());
+                    if (annotation != null) {
+                        PsiAnnotationMemberValue attributeValue = annotation.findAttributeValue("value");
+                        if (attributeValue != null) {
+                            String columnName = attributeValue.getText().replaceAll("\"", "");
+
+                            String fieldName = field.getName();//createUserId
+                            String fieldType = field.getType().getCanonicalText();//java.lang.String
+                            int idx = fieldType.lastIndexOf('.');
+                            if (idx > 0) {
+                                fieldType = fieldType.substring(idx + 1);
+                            }
+
+                            SuperFieldInfo superField = new SuperFieldInfo(columnName, fieldName, fieldType);
+                            superFieldList.add(superField);
+                        }
+                    }
+                }
+            });
         }
 
         String extraDomainName = domainName;
@@ -146,6 +173,7 @@ public class GenerateCode {
             return;
         }
         DomainInfo domainInfo = buildDomainInfo(generateConfig, domainName);
+        domainInfo.setSuperFields(superFieldList);
         // 根据模板生成代码的插件
         configExtraPlugin(extraDomainName, context, domainInfo, configSetting,generateConfig);
         // 界面配置的扩展插件
@@ -188,6 +216,8 @@ public class GenerateCode {
         domainInfo.setBasePath(generateConfig.getBasePath());
         domainInfo.setBasePackage(generateConfig.getBasePackage());
         domainInfo.setRelativePackage(generateConfig.getRelativePackage());
+        domainInfo.setSuperClass(generateConfig.getSuperClass());
+        domainInfo.setBaseClass(generateConfig.getBaseClass());
         domainInfo.setEncoding(generateConfig.getEncoding());
         domainInfo.setFileName(domainName);
         return domainInfo;
@@ -260,6 +290,10 @@ public class GenerateCode {
         // 重置实体模板的类名填充
         if (CodeGenerateUI.DOMAIN.equals(moduleInfo.getConfigName())) {
             customDomainInfo = domainInfo.copyFromFileName(extraDomainName);
+        } else if ("baseDomain".equals(moduleInfo.getConfigName())) {
+            customDomainInfo = domainInfo.copyFromFileName(extraDomainName);
+        } else if ("extDomain".equals(moduleInfo.getConfigName())) {
+            customDomainInfo = domainInfo.copyFromFileName(extraDomainName);
         }
         if (customDomainInfo == null) {
             customDomainInfo = domainInfo;
@@ -270,6 +304,7 @@ public class GenerateCode {
     private static ModuleInfoGo replaceByDomainInfo(ModuleInfoGo moduleInfo, DomainInfo domainInfo) {
         ModuleInfoGo moduleUIInfo = new ModuleInfoGo();
         moduleUIInfo.setConfigName(moduleInfo.getConfigName());
+        moduleUIInfo.setSuperClass(domainInfo.getSuperClass());
         moduleUIInfo.setModulePath(DomainPlaceHolder.replace(moduleInfo.getModulePath(), domainInfo));
         moduleUIInfo.setBasePath(DomainPlaceHolder.replace(moduleInfo.getBasePath(), domainInfo));
         moduleUIInfo.setPackageName(DomainPlaceHolder.replace(moduleInfo.getPackageName(), domainInfo));
@@ -277,6 +312,17 @@ public class GenerateCode {
         moduleUIInfo.setFileNameWithSuffix(DomainPlaceHolder.replace(moduleInfo.getFileNameWithSuffix(), domainInfo));
         moduleUIInfo.setConfigFileName(moduleInfo.getConfigFileName());
         moduleUIInfo.setEncoding(DomainPlaceHolder.replace(moduleInfo.getEncoding(), domainInfo));
+        //TODO: 继承基类
+        if (!StringUtils.isEmpty(domainInfo.getBaseClass())) {
+            moduleUIInfo.setBaseClass(domainInfo.getBaseClass());
+            moduleUIInfo.setShortBaseClass(domainInfo.getBaseClass().substring(domainInfo.getBaseClass().lastIndexOf('.') + 1));
+            // moduleUIInfo.setSuperFields(domainInfo.getSuperFields()); 超级基类中应不包含@TableField注解的字段，实体基类中不需要进行继承处理。// TODO：BUG：可能会与超级基类中的相同属性名冲突
+        }
+        if (!StringUtils.isEmpty(domainInfo.getSuperClass())) {
+            moduleUIInfo.setSuperClass(domainInfo.getSuperClass());
+            moduleUIInfo.setShortSuperClass(domainInfo.getSuperClass().substring(domainInfo.getSuperClass().lastIndexOf('.') + 1));
+            moduleUIInfo.setSuperFields(domainInfo.getSuperFields());
+        }
         // 校验文件模板必须存在
         if (moduleUIInfo.getConfigFileName() == null) {
             throw new RuntimeException("模板文件为空, 无法生成代码. config: " + moduleUIInfo.getConfigName());

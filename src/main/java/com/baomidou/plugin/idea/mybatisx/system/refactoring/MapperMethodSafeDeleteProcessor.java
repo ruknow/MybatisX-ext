@@ -50,14 +50,12 @@ public class MapperMethodSafeDeleteProcessor extends SafeDeleteProcessorDelegate
     }
 
     @Override
-    public @Nullable
-    NonCodeUsageSearchInfo findUsages(@NotNull PsiElement element, @NotNull PsiElement[] allElementsToDelete, @NotNull List<UsageInfo> result) {
+    public @Nullable NonCodeUsageSearchInfo findUsages(@NotNull PsiElement psiElement, PsiElement @NotNull [] psiElements, @NotNull List<? super UsageInfo> list) {
         return null;
     }
 
     @Override
-    public @Nullable
-    Collection<PsiElement> getAdditionalElementsToDelete(@NotNull PsiElement element, @NotNull Collection<PsiElement> allElementsToDelete, boolean askUser) {
+    public @Nullable Collection<PsiElement> getAdditionalElementsToDelete(@NotNull PsiElement psiElement, @NotNull Collection<? extends PsiElement> collection, boolean b) {
         return null;
     }
 
@@ -95,8 +93,8 @@ public class MapperMethodSafeDeleteProcessor extends SafeDeleteProcessorDelegate
     }
 
     @Override
-    public @Nullable
-    Collection<? extends PsiElement> getElementsToSearch(@NotNull PsiElement element, @Nullable Module module, @NotNull Collection<PsiElement> allElementsToDelete) {
+    public @Nullable Collection<? extends PsiElement> getElementsToSearch(@NotNull PsiElement psiElement, @Nullable Module module, @NotNull Collection<? extends PsiElement> collection) {
         return null;
     }
+
 }

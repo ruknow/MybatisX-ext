@@ -9,13 +9,13 @@ import ${baseService};
         </#if>
     </#list>
 </#if>
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.yuanzy.framework.mybatis.service.ICommonService;
 
 /**
-* @author ${author!}
-* @description 针对表【${tableClass.tableName}<#if tableClass.remark?has_content>(${tableClass.remark!})</#if>】的数据库操作Service
-* @createDate ${.now?string('yyyy-MM-dd HH:mm:ss')}
-*/
-public interface ${baseInfo.fileName} extends IService<${tableClass.shortClassName}> {
+ * <p>描述：服务接口类 ${tableClass.tableName}<#if tableClass.remark?has_content> (${tableClass.remark!})</#if></p>
+ * <p>时间：${.now?string('yyyy-MM-dd HH:mm:ss')}</p>
+ * @author ${author!}
+ */
+public interface ${baseInfo.fileName} extends ICommonService<${tableClass.shortClassName}> {
 
 }

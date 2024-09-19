@@ -1,7 +1,10 @@
 package com.baomidou.plugin.idea.mybatisx.generate.template;
 
 import com.baomidou.plugin.idea.mybatisx.generate.dto.CustomTemplateRoot;
+import com.baomidou.plugin.idea.mybatisx.generate.dto.FieldInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.ModuleInfoGo;
+import com.baomidou.plugin.idea.mybatisx.generate.dto.SuperFieldInfo;
+import com.baomidou.plugin.idea.mybatisx.util.StringUtils;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
@@ -20,7 +23,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * freemarker 模板格式化代码生成
@@ -55,7 +61,7 @@ public class FreeMakerFormatter implements JavaFormatter {
         try {
             ModuleInfoGo templateSettingDTO = rootObject.getModuleUIInfo();
             String modulePath = rootObject.getModuleUIInfo().getModulePath() + "/" + templateSettingDTO.getBasePath();
-            Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
+            Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
             cfg.setDirectoryForTemplateLoading(new File(modulePath));
             // 设置模板加载器
 
@@ -70,6 +76,7 @@ public class FreeMakerFormatter implements JavaFormatter {
             Writer writer = new StringWriter();
             Map<String, Object> map = new HashMap<>();
 
+            prepare(templateSettingDTO, classInfo);
             map.put("baseInfo", templateSettingDTO);
             map.put("tableClass", classInfo);
             map.put("author", System.getProperty(USER_NAME, "mybatisX"));
@@ -92,4 +99,40 @@ public class FreeMakerFormatter implements JavaFormatter {
         return new FileTemplateLoader(new File(basePath));
     }
 
+    private void prepare(ModuleInfoGo templateSettingDTO, ClassInfo classInfo) {
+        Set<String> allFieldNames = classInfo.getAllFields().stream()
+            .map(FieldInfo::getColumnName).collect(Collectors.toSet());
+
+        Set<String> superFieldNames = templateSettingDTO.getSuperFields().stream()
+            .map(SuperFieldInfo::getColumnName).collect(Collectors.toSet());
+
+        // TODO:实体继承基类的判断
+        if (allFieldNames.containsAll(superFieldNames)) {
+            setIsSuperField(classInfo.getPkFields(), superFieldNames);
+            setIsSuperField(classInfo.getBaseFields(), superFieldNames);
+            setIsSuperField(classInfo.getBaseBlobFields(), superFieldNames);
+            setIsSuperField(classInfo.getAllFields(), superFieldNames);
+        } else if (!StringUtils.isEmpty(templateSettingDTO.getBaseClass())) {
+
+            setIsSuperField(classInfo.getPkFields(), superFieldNames);
+            setIsSuperField(classInfo.getBaseFields(), superFieldNames);
+            setIsSuperField(classInfo.getBaseBlobFields(), superFieldNames);
+            setIsSuperField(classInfo.getAllFields(), superFieldNames);
+            templateSettingDTO.setSuperClass(templateSettingDTO.getBaseClass());
+            templateSettingDTO.setShortSuperClass(templateSettingDTO.getShortBaseClass());
+        } else {
+            templateSettingDTO.setSuperClass(null);
+            templateSettingDTO.setShortSuperClass(null);
+        }
+
+        for (SuperFieldInfo superField : templateSettingDTO.getSuperFields()) {
+            superField.setNotExistColumn(!allFieldNames.contains(superField.getColumnName()));
+        }
+    }
+
+    private static void setIsSuperField(List<FieldInfo> allFields, Set<String> superFieldNames) {
+        for (FieldInfo field : allFields) {
+            field.setNotSuperColumn(!superFieldNames.contains(field.getColumnName()));
+        }
+    }
 }

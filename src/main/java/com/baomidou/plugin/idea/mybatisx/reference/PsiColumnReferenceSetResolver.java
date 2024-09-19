@@ -146,8 +146,12 @@ public class PsiColumnReferenceSetResolver {
         DbPsiFacade dbPsiFacade = DbPsiFacade.getInstance(project);
         DasColumn child = DasUtil.findChild(dasTable, DasColumn.class, ObjectKind.COLUMN, firstText);
         if (child != null) {
-            DbElement element = dbPsiFacade.findElement(child);
-            return Optional.ofNullable(element);
+            for (DbDataSource dataSource : dbPsiFacade.getDataSources()) {
+                DbElement element = dataSource.findElement(child);
+                if (element != null && element.isValid()) {
+                    return Optional.ofNullable(element);
+                }
+            }
         }
         return Optional.empty();
     }

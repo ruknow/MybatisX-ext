@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <templates>
     <template>
+        <property name="configName" value="baseDomain"/>
+        <property name="configFile" value="baseDomain.ftl"/>
+        <property name="fileName" value="Base${domain.fileName}"/>
+        <property name="suffix" value=".java"/>
+        <property name="packageName" value="${domain.basePackage}.domain.base"/>
+        <property name="encoding" value="${domain.encoding}"/>
+        <property name="basePath" value="${domain.basePath}"/>
+    </template>
+    <template>
+        <property name="configName" value="extDomain"/>
+        <property name="configFile" value="extDomain.ftl"/>
+        <property name="fileName" value="${domain.fileName}"/>
+        <property name="suffix" value=".java"/>
+        <property name="packageName" value="${domain.basePackage}.domain.ext"/>
+        <property name="encoding" value="${domain.encoding}"/>
+        <property name="basePath" value="${domain.basePath}"/>
+    </template>
+    <template>
         <property name="configName" value="serviceInterface"/>
         <property name="configFile" value="serviceInterface.ftl"/>
         <property name="fileName" value="${domain.fileName}Service"/>
         <property name="suffix" value=".java"/>
-        <property name="packageName" value="${domain.basePackage}.service"/>
+        <property name="packageName" value="${domain.basePackage}.service.face"/>
         <property name="encoding" value="${domain.encoding}"/>
         <property name="basePath" value="${domain.basePath}"/>
     </template>
@@ -30,10 +48,28 @@
     <template>
         <property name="configName" value="mapperXml"/>
         <property name="configFile" value="mapperXml.ftl"/>
-        <property name="fileName" value="${domain.fileName}Mapper"/>
+        <property name="fileName" value="Base${domain.fileName}Mapper"/>
         <property name="suffix" value=".xml"/>
-        <property name="packageName" value="${domain.basePackage}.mapper"/>
+        <property name="packageName" value="mapper.base"/>
         <property name="encoding" value="${domain.encoding}"/>
         <property name="basePath" value="src/main/resources"/>
+    </template>
+    <template>
+        <property name="configName" value="extMapperXml"/>
+        <property name="configFile" value="extMapperXml.ftl"/>
+        <property name="fileName" value="${domain.fileName}Mapper"/>
+        <property name="suffix" value=".xml"/>
+        <property name="packageName" value="mapper.ext"/>
+        <property name="encoding" value="${domain.encoding}"/>
+        <property name="basePath" value="src/main/resources"/>
+    </template>
+    <template>
+        <property name="configName" value="controller"/>
+        <property name="configFile" value="controller.ftl"/>
+        <property name="fileName" value="${domain.fileName}Controller"/>
+        <property name="suffix" value=".java"/>
+        <property name="packageName" value="${domain.basePackage}.controller"/>
+        <property name="encoding" value="${domain.encoding}"/>
+        <property name="basePath" value="${domain.basePath}"/>
     </template>
 </templates>

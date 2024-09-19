@@ -1,6 +1,6 @@
 package ${baseInfo.packageName};
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yuanzy.framework.mybatis.service.impl.CommonServiceImpl;
 import ${tableClass.fullClassName};
 import ${serviceInterface.packageName}.${serviceInterface.fileName};
 import ${mapperInterface.packageName}.${mapperInterface.fileName};
@@ -15,13 +15,12 @@ import ${baseService};
 import org.springframework.stereotype.Service;
 
 /**
-* @author ${author!}
-* @description 针对表【${tableClass.tableName}<#if tableClass.remark?has_content>(${tableClass.remark!})</#if>】的数据库操作Service实现
-* @createDate ${.now?string('yyyy-MM-dd HH:mm:ss')}
-*/
+ * <p>描述：服务实现类 ${tableClass.tableName}<#if tableClass.remark?has_content> (${tableClass.remark!})</#if></p>
+ * <p>时间：${.now?string('yyyy-MM-dd HH:mm:ss')}</p>
+ * @author ${author!}
+ */
 @Service
-public class ${baseInfo.fileName} extends ServiceImpl<${mapperInterface.fileName}, ${tableClass.shortClassName}>
-    implements ${serviceInterface.fileName}{
+public class ${baseInfo.fileName} extends CommonServiceImpl<${mapperInterface.fileName}, ${tableClass.shortClassName}> implements ${serviceInterface.fileName} {
 
 }
 

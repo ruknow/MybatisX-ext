@@ -33,6 +33,10 @@ public class ClassInfo {
      */
     private String tableName;
     /**
+     * 短表名
+     */
+    private String shortTableName;
+    /**
      * 表的注释
      */
     private String remark;
@@ -63,6 +67,7 @@ public class ClassInfo {
         classInfo.fullClassName = introspectedTable.getBaseRecordType();
         classInfo.shortClassName = type.getShortName();
         classInfo.lowerFirstShortClassName = StringUtils.firstToLowerCase(classInfo.shortClassName);
+        classInfo.shortTableName = classInfo.convertToTableShortName(type.getShortName());
         classInfo.tableName = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         classInfo.remark = introspectedTable.getRemarks() == null ? "" : introspectedTable.getRemarks();
 
@@ -97,4 +102,22 @@ public class ClassInfo {
         return classInfo;
     }
 
+    private String convertToTableShortName(String shortClassName) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : shortClassName.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                sb.append(Character.toLowerCase(c));
+            }
+        }
+        return sb.toString();
+    }
+
+    public boolean hasSuperColumn(String columnName) {
+        for (FieldInfo field : allFields) {
+            if(field.getColumnName().equalsIgnoreCase(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

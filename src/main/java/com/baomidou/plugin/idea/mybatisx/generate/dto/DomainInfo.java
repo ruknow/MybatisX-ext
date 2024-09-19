@@ -3,6 +3,8 @@ package com.baomidou.plugin.idea.mybatisx.generate.dto;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class DomainInfo implements Serializable {
@@ -12,6 +14,10 @@ public class DomainInfo implements Serializable {
     private String fileName;
     private String basePath;
     private String modulePath;
+    private String superClass;
+    private String baseClass;
+
+    private final List<SuperFieldInfo> superFields = new ArrayList<>();
 
     public void setModulePath(String modulePath) {
         this.modulePath = modulePath;
@@ -37,6 +43,19 @@ public class DomainInfo implements Serializable {
         this.relativePackage = relativePackage;
     }
 
+    public void setSuperClass(String superClass) {
+        this.superClass = superClass;
+    }
+
+    public void setBaseClass(String baseClass) {
+        this.baseClass = baseClass;
+    }
+
+    public void setSuperFields(List<SuperFieldInfo> superFields) {
+        this.superFields.clear();
+        this.superFields.addAll(superFields);
+    }
+
     public DomainInfo copyFromFileName(String extraDomainName) {
         DomainInfo domainInfo = new DomainInfo();
         domainInfo.setModulePath(modulePath);
@@ -45,6 +64,9 @@ public class DomainInfo implements Serializable {
         domainInfo.setBasePackage(basePackage);
         domainInfo.setFileName(extraDomainName);
         domainInfo.setRelativePackage(relativePackage);
+        domainInfo.setSuperClass(superClass);
+        domainInfo.setBaseClass(baseClass);
+        domainInfo.setSuperFields(superFields);
         return domainInfo;
     }
 }

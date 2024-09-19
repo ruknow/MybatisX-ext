@@ -127,9 +127,7 @@ public class ContextPsiColumnReference extends PsiReferenceBase<XmlAttributeValu
                     List<DbElement> dbElementList = new LinkedList<>();
                     JBIterable<? extends DasColumn> columns = DasUtil.getColumns(dasTable);
                     for (DasColumn column : columns) {
-
-                        DbElement element = dbPsiFacade.findElement(column);
-
+                        DbElement element = dataSource.findElement(column);
                         dbElementList.add(element);
                     }
                     return dbElementList;

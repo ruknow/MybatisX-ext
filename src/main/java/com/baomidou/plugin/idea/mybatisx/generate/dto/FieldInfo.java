@@ -18,6 +18,10 @@ public class FieldInfo {
      */
     private String columnName;
     /**
+     * 数据库字段类型
+     */
+    private String typeName;
+    /**
      * 列实际限制的长度
      */
     private int columnLength;
@@ -45,6 +49,10 @@ public class FieldInfo {
      * jdbcType 的值
      */
     private String jdbcType;
+    /**
+     * 缺省值
+     */
+    private String defaultValue;
 
     /**
      * 是否允许为空
@@ -55,13 +63,21 @@ public class FieldInfo {
      */
     private boolean autoIncrement;
 
+    private boolean notSuperColumn = true;
+
+    public void setNotSuperColumn(boolean notSuperColumn) {
+        this.notSuperColumn = notSuperColumn;
+    }
+
     public static FieldInfo build(IntrospectedColumn introspectedColumn) {
         FieldInfo fieldInfo = new FieldInfo();
         fieldInfo.fieldName = introspectedColumn.getJavaProperty();
         fieldInfo.columnName = introspectedColumn.getActualColumnName();
+        fieldInfo.typeName = introspectedColumn.getActualTypeName();
         fieldInfo.jdbcType = introspectedColumn.getJdbcTypeName();
         fieldInfo.columnLength = introspectedColumn.getLength();
         fieldInfo.columnScale = introspectedColumn.getScale();
+        fieldInfo.defaultValue = introspectedColumn.getDefaultValue();
         FullyQualifiedJavaType fullyQualifiedJavaType = introspectedColumn.getFullyQualifiedJavaType();
         fieldInfo.shortTypeName = fullyQualifiedJavaType.getShortName();
         fieldInfo.fullTypeName = fullyQualifiedJavaType.getFullyQualifiedName();

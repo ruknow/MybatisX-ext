@@ -60,7 +60,6 @@ public class TablePreviewUI {
     private JTextField ignoreTablePrefixTextField;
     private JTextField ignoreTableSuffixTextField;
     private JTextField fieldPrefixTextField;
-    private JLabel lblFieldSuffix;
     private JTextField fieldSuffixTextField;
     private JTextField superClassTextField;
     private JTextField encodingTextField;
@@ -74,8 +73,9 @@ public class TablePreviewUI {
     private JTextField extraClassSuffixTextField;
     private JLabel keepTableName;
     private JRadioButton camelRadioButton;
-    private JRadioButton sameAsTablenameRadioButton;
+    private JRadioButton tableNameRadioButton;
     private JPanel classNameStrategyPanel;
+    private JTextField baseClassTextField;
     private PsiElement[] tableElements;
     private List<DbTable> dbTables;
     private String moduleName;
@@ -93,8 +93,6 @@ public class TablePreviewUI {
                 .disableUpDownActions()
                 .createPanel(),
             gridConstraints);
-
-
     }
 
     public DomainInfo buildDomainInfo() {
@@ -124,6 +122,7 @@ public class TablePreviewUI {
         fieldPrefixTextField.setText(generateConfig.getIgnoreFieldPrefix());
         fieldSuffixTextField.setText(generateConfig.getIgnoreFieldSuffix());
         superClassTextField.setText(generateConfig.getSuperClass());
+        baseClassTextField.setText(generateConfig.getBaseClass());
         encodingTextField.setText(generateConfig.getEncoding());
         basePackageTextField.setText(generateConfig.getBasePackage());
         basePathTextField.setText(generateConfig.getBasePath());
@@ -179,12 +178,29 @@ public class TablePreviewUI {
             }
         };
         camelRadioButton.addItemListener(classNameChangeListener);
-        sameAsTablenameRadioButton.addItemListener(classNameChangeListener);
+        tableNameRadioButton.addItemListener(classNameChangeListener);
 
         ignoreTablePrefixTextField.getDocument().addDocumentListener(listener);
 
         ignoreTableSuffixTextField.getDocument().addDocumentListener(listener);
 
+
+        // 选择基类
+        baseClassTextField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                TreeJavaClassChooserDialog treeJavaClassChooserDialog =
+                    new TreeJavaClassChooserDialog("Please Select a Base Class", project, GlobalSearchScope.allScope(project),null,null);
+                treeJavaClassChooserDialog.show();
+                PsiClass selectedClass = treeJavaClassChooserDialog.getSelected();
+                // 没有选择类
+                if (selectedClass == null) {
+                    return;
+                }
+                baseClassTextField.setText(selectedClass.getQualifiedName());
+            }
+
+        });
 
         // 选择父类
         superClassTextField.addMouseListener(new MouseAdapter() {
@@ -200,7 +216,6 @@ public class TablePreviewUI {
                 }
                 superClassTextField.setText(selectedClass.getQualifiedName());
             }
-
         });
     }
 
@@ -284,6 +299,7 @@ public class TablePreviewUI {
         generateConfig.setIgnoreFieldPrefix(fieldPrefixTextField.getText());
         generateConfig.setIgnoreFieldSuffix(fieldSuffixTextField.getText());
         generateConfig.setSuperClass(superClassTextField.getText());
+        generateConfig.setBaseClass(baseClassTextField.getText());
         generateConfig.setEncoding(encodingTextField.getText());
         generateConfig.setBasePackage(basePackageTextField.getText());
         generateConfig.setBasePath(basePathTextField.getText());

@@ -10,6 +10,7 @@ import com.baomidou.plugin.idea.mybatisx.generate.util.DomainPlaceHolder;
 import com.baomidou.plugin.idea.mybatisx.util.CollectionUtils;
 import com.baomidou.plugin.idea.mybatisx.util.StringUtils;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -306,6 +307,10 @@ public class CodeGenerateUI {
                     refresh = true;
                 }
 
+                @Override
+                public @NotNull ActionUpdateThread getActionUpdateThread() {
+                    return ActionUpdateThread.BGT;
+                }
             })
             .disableAddAction()
             .disableUpDownActions()

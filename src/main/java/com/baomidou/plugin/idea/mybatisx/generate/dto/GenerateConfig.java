@@ -75,6 +75,11 @@ public class GenerateConfig {
     @Getter
     private String superClass;
     /**
+     * 没有父类中全部字段时需要继承的基类
+     */
+    @Getter
+    private String baseClass;
+    /**
      * 需要移除的字段前缀
      */
     @Getter
@@ -90,7 +95,7 @@ public class GenerateConfig {
      *
      * @Repository
      */
-//    private boolean repositoryAnnotation;
+   // private boolean repositoryAnnotation;
 
     @Getter
     private boolean useLombokPlugin;
@@ -227,6 +232,10 @@ public class GenerateConfig {
         this.superClass = superClass;
     }
 
+    public void setBaseClass(String baseClass) {
+        this.baseClass = baseClass;
+    }
+
     public void setUseActualColumnAnnotationInject(boolean useActualColumnAnnotationInject) {
         this.useActualColumnAnnotationInject = useActualColumnAnnotationInject;
     }
@@ -252,6 +261,7 @@ public class GenerateConfig {
             ", needToStringHashcodeEquals=" + needToStringHashcodeEquals +
             ", needsComment=" + needsComment +
             ", rootClass='" + superClass + '\'' +
+            ", baseClass='" + baseClass + '\'' +
             ", removedPrefix='" + ignoreFieldPrefix + '\'' +
             ", removedSuffix='" + ignoreFieldSuffix + '\'' +
             ", useLombokPlugin=" + useLombokPlugin +

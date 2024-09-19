@@ -42,7 +42,7 @@ public class DefaultGenerateConfig extends GenerateConfig {
 
     @Override
     public boolean isNeedToStringHashcodeEquals() {
-        return true;
+        return false;
     }
 
     @Override
@@ -64,6 +64,46 @@ public class DefaultGenerateConfig extends GenerateConfig {
     @Override
     public String getEncoding() {
         return "UTF-8";
+    }
+
+    @Override
+    public String getSuperClass() {
+        return "com.yuanzy.framework.mybatis.model.BaseModel";
+    }
+
+    @Override
+    public String getBaseClass() {
+        return "com.yuanzy.framework.mybatis.model.ParamModel";
+    }
+
+    @Override
+    public boolean isUseLombokPlugin() {
+        return true;
+    }
+
+    @Override
+    public boolean isUseActualColumns() {
+        return false;
+    }
+
+    @Override
+    public boolean isJsr310Support() {
+        return true;
+    }
+
+    @Override
+    public boolean isNeedSerializable() {
+        return false;
+    }
+
+    @Override
+    public boolean isNeedJdbcType() {
+        return true;
+    }
+
+    @Override
+    public boolean isUseActualColumnAnnotationInject() {
+        return false;
     }
 
     @Override
